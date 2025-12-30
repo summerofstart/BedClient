@@ -99,6 +99,10 @@ public class HypixelApiHandler {
             player.addProperty("displayname", displayUsername);
         }
 
+        if (player.has("stats") && !player.get("stats").isJsonNull() && player.getAsJsonObject("stats").has("Bedwars")) {
+            sendToBedwarsLove(uuid, displayUsername, player.getAsJsonObject("stats").getAsJsonObject("Bedwars"));
+        }
+
         String chatMessage = formatStats(player, mode);
         if (chatMessage != null) {
             sendMessageToPlayer(chatMessage);
@@ -272,5 +276,50 @@ public class HypixelApiHandler {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message));
             }
         });
+    }
+
+    private static void sendToBedwarsLove(String uuid, String username, JsonObject bedwarsStats) {
+        CompletableFuture.runAsync(() -> {
+            if (!BedwarsStatsConfig.sendToBedwarsLove) {
+                return;
+            }
+            try {
+                JsonObject payload = new JsonObject();
+                payload.addProperty("uuid", uuid);
+                payload.addProperty("username", username);
+                payload.add("stats", bedwarsStats);
+
+                sendHttpPostRequest(BedwarsStatsConfig.bedwarsLoveApiUrl, payload.toString());
+            } catch (Exception e) {
+                // Silently fail or log to console, to avoid spamming the user's chat
+                System.err.println("[BedwarsStats] Failed to send data to bedwars.love: " + e.getMessage());
+            }
+        });
+    }
+
+    private static String sendHttpPostRequest(String urlString, String jsonPayload) throws Exception {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json; utf-8");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setDoOutput(true);
+
+        try(java.io.OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonPayload.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        if (connection.getResponseCode() == 200) {
+            try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                String inputLine;
+                StringBuilder content = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+                return content.toString();
+            }
+        }
+        return null;
     }
 }

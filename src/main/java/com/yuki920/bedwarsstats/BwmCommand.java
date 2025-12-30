@@ -70,7 +70,7 @@ public class BwmCommand extends CommandBase {
 
     private void handleSettingsCommand(ICommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings <apikey|mode|nick>"));
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings <apikey|mode|nick|bedwarslove>"));
             return;
         }
         String setting = args[1].toLowerCase();
@@ -106,8 +106,32 @@ public class BwmCommand extends CommandBase {
                 BedwarsStatsConfig.setMyNick(nick);
                 sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "Your nick has been set to: " + nick));
                 break;
+            case "bedwarslove":
+                if (args.length < 3) {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings bedwarslove <on|off|url>"));
+                    return;
+                }
+                String action = args[2].toLowerCase();
+                if (action.equals("on")) {
+                    BedwarsStatsConfig.setSendToBedwarsLove(true);
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "bedwars.love integration enabled."));
+                } else if (action.equals("off")) {
+                    BedwarsStatsConfig.setSendToBedwarsLove(false);
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "bedwars.love integration disabled."));
+                } else if (action.equals("url")) {
+                    if (args.length < 4) {
+                        sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings bedwarslove url <new_url>"));
+                        return;
+                    }
+                    String newUrl = args[3];
+                    BedwarsStatsConfig.setBedwarsLoveApiUrl(newUrl);
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN + "bedwars.love API URL set to: " + newUrl));
+                } else {
+                    sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings bedwarslove <on|off|url>"));
+                }
+                break;
             default:
-                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings <apikey|mode|nick>"));
+                sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Usage: /bwm settings <apikey|mode|nick|bedwarslove>"));
                 break;
         }
     }
@@ -119,7 +143,7 @@ public class BwmCommand extends CommandBase {
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("settings")) {
-                return getListOfStringsMatchingLastWord(args, "apikey", "mode", "nick");
+                return getListOfStringsMatchingLastWord(args, "apikey", "mode", "nick", "bedwarslove");
             }
             if (args[0].equalsIgnoreCase("stats")) {
                 // ▼▼▼▼▼ ここを修正 ▼▼▼▼▼
@@ -134,6 +158,9 @@ public class BwmCommand extends CommandBase {
             }
         }
         if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("settings") && args[1].equalsIgnoreCase("bedwarslove")) {
+                return getListOfStringsMatchingLastWord(args, "on", "off", "url");
+            }
              if (args[0].equalsIgnoreCase("stats") || (args[0].equalsIgnoreCase("settings") && args[1].equalsIgnoreCase("mode"))) {
                 List<String> modes = Arrays.stream(BedwarsStatsConfig.BedwarsMode.values())
                                            .map(Enum::name)

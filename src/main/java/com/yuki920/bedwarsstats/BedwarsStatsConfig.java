@@ -10,6 +10,8 @@ public class BedwarsStatsConfig {
     public static String apiKey = "";
     public static String myNick = "";
     public static BedwarsMode bedwarsMode = BedwarsMode.OVERALL;
+    public static boolean sendToBedwarsLove = false;
+    public static String bedwarsLoveApiUrl = "http://localhost:3000/api/live";
 
     public enum BedwarsMode {
         OVERALL("Overall", ""),
@@ -45,6 +47,8 @@ public class BedwarsStatsConfig {
 
         apiKey = config.getString("apiKey", Configuration.CATEGORY_GENERAL, "", "Your Hypixel API key.");
         myNick = config.getString("myNick", Configuration.CATEGORY_GENERAL, "", "If you are nicked, enter your nick here to see your own stats.");
+        sendToBedwarsLove = config.getBoolean("sendToBedwarsLove", Configuration.CATEGORY_GENERAL, false, "Enable sending data to bedwars.love for real-time stats.");
+        bedwarsLoveApiUrl = config.getString("bedwarsLoveApiUrl", Configuration.CATEGORY_GENERAL, "http://localhost:3000/api/live", "The API endpoint for bedwars.love.");
 
         String modeString = config.getString("bedwarsMode", Configuration.CATEGORY_GENERAL, "OVERALL", "The Bedwars mode to display stats for.",
                 new String[]{"OVERALL", "SOLO", "DOUBLES", "THREES", "FOURS"});
@@ -74,6 +78,18 @@ public class BedwarsStatsConfig {
     public static void setBedwarsMode(BedwarsMode newMode) {
         bedwarsMode = newMode;
         config.get(Configuration.CATEGORY_GENERAL, "bedwarsMode", "OVERALL").set(newMode.name());
+        config.save();
+    }
+
+    public static void setSendToBedwarsLove(boolean enabled) {
+        sendToBedwarsLove = enabled;
+        config.get(Configuration.CATEGORY_GENERAL, "sendToBedwarsLove", false).set(enabled);
+        config.save();
+    }
+
+    public static void setBedwarsLoveApiUrl(String newUrl) {
+        bedwarsLoveApiUrl = newUrl;
+        config.get(Configuration.CATEGORY_GENERAL, "bedwarsLoveApiUrl", "http://localhost:3000/api/live").set(newUrl);
         config.save();
     }
 }
