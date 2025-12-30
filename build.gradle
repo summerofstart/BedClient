@@ -26,7 +26,15 @@ minecraft {
     makeObfSourceJar = false
 }
 
+repositories {
+    maven {
+        url 'https://repo.hypixel.net/repository/Hypixel/'
+    }
+}
+
 dependencies {
+    compile 'net.hypixel:hypixel-api:4.4'
+    compile 'net.hypixel:hypixel-api-transport-apache:4.4'
     // if you want to use classes of another mod/library, you can add that .jar in a /libs folder
     // in the project, then open the project structure in `intellIJ > libraries > add` and select the jar
     // you will now be able to compile your mod while using classes of another mod
