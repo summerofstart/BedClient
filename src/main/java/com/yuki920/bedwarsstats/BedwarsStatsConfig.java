@@ -44,6 +44,7 @@ public class BedwarsStatsConfig {
         config.load();
 
         apiKey = config.getString("apiKey", Configuration.CATEGORY_GENERAL, "", "Your Hypixel API key.");
+        HypixelApiHandler.initializeApi();
         myNick = config.getString("myNick", Configuration.CATEGORY_GENERAL, "", "If you are nicked, enter your nick here to see your own stats.");
 
         String modeString = config.getString("bedwarsMode", Configuration.CATEGORY_GENERAL, "OVERALL", "The Bedwars mode to display stats for.",
@@ -63,6 +64,7 @@ public class BedwarsStatsConfig {
         apiKey = newApiKey;
         config.get(Configuration.CATEGORY_GENERAL, "apiKey", "").set(newApiKey);
         config.save();
+        HypixelApiHandler.initializeApi();
     }
 
     public static void setMyNick(String newNick) {
